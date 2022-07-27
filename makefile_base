@@ -1,0 +1,34 @@
+.SILENT:
+.DEFAULT_GOAL := help
+
+COLOR_RESET=\033[0;39;49m
+COLOR_BOLD=\033[1m
+COLOR_BLUE=\033[38;5;20m
+COLOR_GREE=\033[38;5;35m
+PROJECT := Instant Interview
+SECTION ?= Root
+
+## Prints help message
+help:
+
+	@awk 'BEGIN {FS = ":.*##"; printf "Usage: make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+	printf "\n${COLOR_YELO}${PROJECT} - ${SECTION}\n-------\n${COLOR_RESET}"
+	printf "${COLOR_BOLD}  Usage:${COLOR_RESET}"
+	printf "\n"
+	printf "${COLOR_BLUE}    make <target>${COLOR_RESET}"
+	printf "\n"
+	printf "\n"
+	printf "${COLOR_BOLD}  Targets:${COLOR_RESET}"
+	printf "\n"
+	awk '/^[a-zA-Z\-\_0-9\.%]+:/ { \
+		helpMessage = match(lastLine, /^## (.*)/); \
+		if (helpMessage) { \
+			helpCommand = substr($$1, 0, index($$1, ":")-1); \
+			helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
+			printf "${COLOR_BLUE}    make %-30s${COLOR_RESET} %s\n", helpCommand, helpMessage; \
+		} \
+	} \
+	{ lastLine = $$0 }' $(MAKEFILE_LIST) | sort
+	printf "\n"
+
